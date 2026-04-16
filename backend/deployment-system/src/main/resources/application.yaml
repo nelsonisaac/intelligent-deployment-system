@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: deployment-system
+  datasource:
+    url: jdbc:sqlite:./deployments.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  8080
