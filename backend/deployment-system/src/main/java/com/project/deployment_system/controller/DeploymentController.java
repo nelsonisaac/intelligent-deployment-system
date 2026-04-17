@@ -1,6 +1,7 @@
 package com.project.deployment_system.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,9 +22,13 @@ public class DeploymentController {
     }
 
     @PostMapping("/create")
-    public Deployment createDeployment(@RequestParam String serviveName,
+    public Deployment createDeployment(@RequestParam String serviceName,
             @RequestParam String version) {
-        return deploymentService.createDeployment(serviveName, version);
+        return deploymentService.createDeployment(serviceName, version);
     }
 
+    @PostMapping("/{id}/start")
+    public Deployment startDeployment(@PathVariable Long id) {
+        return deploymentService.startDeployment(id);
+    }
 }
