@@ -12,9 +12,12 @@ import com.project.deployment_system.model.DeploymentStatus;
 import com.project.deployment_system.repository.DeploymentRepository;
 
 @Service
+@AllArgsConstructor
 public class DeploymentService {
 
     private final DeploymentRepository repository;
+
+    private final NginxService nginxService;
 
     @Autowired
     public DeploymentService(DeploymentRepository deploymentRepository) {
@@ -42,26 +45,28 @@ public class DeploymentService {
         deployment.setUpdatedAt(LocalDateTime.now());
         repository.save(deployment);
 
-        boolean success = executeDeploymentScript();
+        String nextEnv = deployment.getEnvironment().equals("BLUE")?"GREEN":"BLUE";
+        boolean success = executeDeploymentScript(nextEnv);
 
         if (success) {
             deployment.setStatus(DeploymentStatus.SUCCESS);
+            deployment.setEnvironment(nextEnv);
+            nginxService.switchTraffic(nextEnv);
+
         } else {
             deployment.setStatus(DeploymentStatus.FAILED);
             rollBackDeployment();
             deployment.setStatus(DeploymentStatus.ROLLED_BACK);
         }
-
         deployment.setUpdatedAt(LocalDateTime.now());
-
         return repository.save(deployment);
     }
 
-    public boolean executeDeploymentScript() {
+    public boolean executeDeploymentScript(String nextEnv) {
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "scripts\\deploy.sh");
+            String deployScript = "scripts/deploy.sh";
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", deployScript, nextEnv);
             processBuilder.redirectErrorStream(true);
-
             Process process = processBuilder.start();
 
             BufferedReader reader = new BufferedReader(
