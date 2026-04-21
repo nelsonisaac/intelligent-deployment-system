@@ -12,7 +12,6 @@ import com.project.deployment_system.model.DeploymentStatus;
 import com.project.deployment_system.repository.DeploymentRepository;
 
 @Service
-@AllArgsConstructor
 public class DeploymentService {
 
     private final DeploymentRepository repository;
@@ -20,8 +19,9 @@ public class DeploymentService {
     private final NginxService nginxService;
 
     @Autowired
-    public DeploymentService(DeploymentRepository deploymentRepository) {
+    public DeploymentService(DeploymentRepository deploymentRepository, NginxService nginxService) {
         this.repository = deploymentRepository;
+        this.nginxService = nginxService;
     }
 
     public Deployment createDeployment(String serviceName, String version) {
